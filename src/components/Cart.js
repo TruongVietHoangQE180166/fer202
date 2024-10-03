@@ -31,7 +31,7 @@ const Cart = ({ cartItems, setCartItems }) => {
           <span className="text-nowrap">Cart</span>
         </div>
         {cartItems.length > 0 && (
-          <span className="badge bg-primary rounded-pill">{cartItems.length}</span>
+          <span className="badge bg-primary rounded-pill">{cartItems.reduce((total, item) => total + item.quantity, 0)}</span>
         )}
       </div>
 
@@ -47,20 +47,28 @@ const Cart = ({ cartItems, setCartItems }) => {
                   <Col xs={6} className="text-start">
                     <strong>{item.name}</strong>
                   </Col>
-                  <Col xs={3}>
-                    <input
-                      type="number"
-                      min="1"
-                      value={item.quantity}
-                      onChange={(e) => updateQuantity(item, parseInt(e.target.value))}
-                      className="form-control"
-                    />
+                  <Col xs={3} className="text-center">
+                    <Button
+                      variant="outline-secondary"
+                      size="sm"
+                      onClick={() => updateQuantity(item, item.quantity - 1)} // Giảm số lượng
+                    >
+                      -
+                    </Button>
+                    <span className="mx-2">{item.quantity}</span>
+                    <Button
+                      variant="outline-secondary"
+                      size="sm"
+                      onClick={() => updateQuantity(item, item.quantity + 1)} // Tăng số lượng
+                    >
+                      +
+                    </Button>
                   </Col>
                   <Col xs={3} className="text-end">
                     <Button
                       variant="danger"
                       size="sm"
-                      onClick={() => updateQuantity(item, 0)}
+                      onClick={() => updateQuantity(item, 0)} // Xóa sản phẩm
                     >
                       Remove
                     </Button>
