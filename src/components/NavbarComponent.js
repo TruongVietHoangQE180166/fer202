@@ -1,16 +1,19 @@
-import React, { useState } from "react";
+import React, { useContext } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Navbar, Nav, NavDropdown, Form, FormControl, Button, Container } from "react-bootstrap";
-import "bootstrap/dist/css/bootstrap.min.css";
 import Cart from "./Cart";
-import CardComponent from "./CardComponent";  // Import CardComponent
 
+ import { ThemeProvider, ThemeContext} from "../context/ThemeContext";
 function NavbarComponent({ cartItems, setCartItems }) {
-  
+  // Sử dụng ThemeContext
+  const { theme, toggleTheme } = useContext(ThemeContext);
+
+  // Thay đổi lớp CSS dựa trên theme
+  const themeClass = theme === "light" ? "bg-light navbar-light" : "bg-dark navbar-dark";
 
   return (
     <>
-      <Navbar bg="light" expand="lg" fixed="top">
+      <Navbar className={themeClass} expand="lg" fixed="top">
         <Container fluid>
           <Navbar.Brand href="#">
             <img
@@ -38,7 +41,7 @@ function NavbarComponent({ cartItems, setCartItems }) {
                 className="me-2"
                 aria-label="Search"
               />
-              <Button variant="dark" type="submit">
+              <Button variant={theme === "light" ? "dark" : "light"} type="submit">
                 Search
               </Button>
             </Form>
@@ -62,13 +65,15 @@ function NavbarComponent({ cartItems, setCartItems }) {
                 <NavDropdown.Item href="#">Order History</NavDropdown.Item>
                 <NavDropdown.Item href="#">Logout</NavDropdown.Item>
               </NavDropdown>
+
+              {/* Nút chuyển đổi theme */}
+              <Button onClick={toggleTheme} variant={theme === "light" ? "secondary" : "light"} className="ms-2">
+                {theme === "light" ? "Dark Mode" : "Light Mode"}
+              </Button>
             </Nav>
           </Navbar.Collapse>
         </Container>
       </Navbar>
-
-      {/* Pass addToCart function to CardComponent */}
-      
     </>
   );
 }
