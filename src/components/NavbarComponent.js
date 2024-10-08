@@ -1,19 +1,19 @@
-import React, { useContext } from "react";
+import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Navbar, Nav, NavDropdown, Form, FormControl, Button, Container } from "react-bootstrap";
-import Cart from "./Cart";
+import { Navbar, Nav, NavDropdown, Form, FormControl, Button, Container, Badge } from "react-bootstrap";
+import { FaShoppingCart } from 'react-icons/fa'; // Import icon giỏ hàng
+import Cart from './Cart'; // Import thành phần Cart
 
- import { ThemeProvider, ThemeContext} from "../context/ThemeContext";
 function NavbarComponent({ cartItems, setCartItems }) {
-  // Sử dụng ThemeContext
-  const { theme, toggleTheme } = useContext(ThemeContext);
+  const [showModal, setShowModal] = useState(false); // Tạo state điều khiển modal
+  const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0); // Tính tổng số lượng giỏ hàng
 
-  // Thay đổi lớp CSS dựa trên theme
-  const themeClass = theme === "light" ? "bg-light navbar-light" : "bg-dark navbar-dark";
+  const handleShow = () => setShowModal(true);  // Hàm để mở modal
+  const handleClose = () => setShowModal(false);  // Hàm để đóng modal
 
   return (
     <>
-      <Navbar className={themeClass} expand="lg" fixed="top">
+      <Navbar className="navbar navbar-dark bg-dark" expand="lg" fixed="top">
         <Container fluid>
           <Navbar.Brand href="#">
             <img
@@ -27,7 +27,7 @@ function NavbarComponent({ cartItems, setCartItems }) {
           <Navbar.Toggle aria-controls="navbarScroll" />
           <Navbar.Collapse id="navbarScroll">
             <Nav className="me-auto my-2 my-lg-0" navbarScroll>
-              <Nav.Link href="#" active>Home</Nav.Link>
+              <Nav.Link href="#">Home</Nav.Link>
               <Nav.Link href="#">Menu</Nav.Link>
               <Nav.Link href="#">Deals</Nav.Link>
               <Nav.Link href="#">About Us</Nav.Link>
@@ -41,13 +41,16 @@ function NavbarComponent({ cartItems, setCartItems }) {
                 className="me-2"
                 aria-label="Search"
               />
-              <Button variant={theme === "light" ? "dark" : "light"} type="submit">
-                Search
-              </Button>
+              <Button variant="outline-light">Search</Button>
             </Form>
 
             <Nav>
-              <Cart cartItems={cartItems} setCartItems={setCartItems} />
+              {/* Phần giỏ hàng với biểu tượng và số lượng */}
+              <Nav.Link onClick={handleShow} style={{ cursor: 'pointer' }}> {/* Thêm sự kiện onClick */}
+                <FaShoppingCart size={24} />
+                {totalItems > 0 && <Badge pill bg="danger">{totalItems}</Badge>}
+              </Nav.Link>
+              
               <NavDropdown
                 title={
                   <img
@@ -65,15 +68,13 @@ function NavbarComponent({ cartItems, setCartItems }) {
                 <NavDropdown.Item href="#">Order History</NavDropdown.Item>
                 <NavDropdown.Item href="#">Logout</NavDropdown.Item>
               </NavDropdown>
-
-              {/* Nút chuyển đổi theme */}
-              <Button onClick={toggleTheme} variant={theme === "light" ? "secondary" : "light"} className="ms-2">
-                {theme === "light" ? "Dark Mode" : "Light Mode"}
-              </Button>
             </Nav>
           </Navbar.Collapse>
         </Container>
       </Navbar>
+
+      {/* Gọi Cart và truyền state điều khiển modal */}
+      <Cart cartItems={cartItems} setCartItems={setCartItems} showModal={showModal} handleClose={handleClose} />
     </>
   );
 }

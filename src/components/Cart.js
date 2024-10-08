@@ -1,13 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Modal, Button, Container, Row, Col } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 
-const Cart = ({ cartItems, setCartItems }) => {
-  const [showModal, setShowModal] = useState(false);
-
-  const handleShow = () => setShowModal(true);
-  const handleClose = () => setShowModal(false);
+const Cart = ({ cartItems, setCartItems, showModal, handleClose }) => {
 
   const updateQuantity = (item, quantity) => {
     if (quantity <= 0) {
@@ -21,20 +17,6 @@ const Cart = ({ cartItems, setCartItems }) => {
 
   return (
     <>
-      <div
-        onClick={handleShow}
-        style={{ cursor: 'pointer', padding: '10px 15px', borderRadius: '5px', backgroundColor: '#f8f9fa' }}
-        className="d-flex justify-content-between align-items-center"
-      >
-        <div className="d-flex align-items-center">
-          <FontAwesomeIcon icon={faShoppingCart} className="me-2" />
-          <span className="text-nowrap">Cart</span>
-        </div>
-        {cartItems.length > 0 && (
-          <span className="badge bg-primary rounded-pill">{cartItems.reduce((total, item) => total + item.quantity, 0)}</span>
-        )}
-      </div>
-
       <Modal show={showModal} onHide={handleClose} centered>
         <Modal.Header closeButton>
           <Modal.Title>Your Cart</Modal.Title>
