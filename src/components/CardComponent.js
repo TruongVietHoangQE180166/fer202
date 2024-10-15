@@ -1,53 +1,77 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "../Style/StyleIndex.css";
-import { Card, Button } from "react-bootstrap";
-import menu1 from "../assets/images/menu1.jpg";
-import menu2 from "../assets/images/menu2.jpg";
-import menu3 from "../assets/images/menu3.jpg";
-import menu4 from "../assets/images/menu4.jpg";
-import menu5 from "../assets/images/menu5.jpg";
-import menu6 from "../assets/images/menu6.jpg";
-import menu7 from "../assets/images/menu7.jpg";
-import menu8 from "../assets/images/menu8.jpg";
+import { Card, Button, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
-function CardComponent({ addToCart }) {  // Nhận hàm addToCart
+function CardComponent({ addToCart }) {  
   const navigate = useNavigate();
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const handleShowMore = () => {
     navigate('/full-menu');
   };
 
-  const pizzas = [
-    { img: menu1, title: "Margarita Pizza", price: "$19.99", onSale: true },
-    { img: menu2, title: "Mushroom Pizza", price: "$19.99", onSale: false },
-    { img: menu3, title: "Hawaiian Pizza", price: "$19.99", onSale: true },
-    { img: menu4, title: "Pesto Pizza", price: "$19.99", onSale: false },
-    { img: menu5, title: "BBQ Chicken Pizza", price: "$21.99", onSale: true },
-    { img: menu6, title: "Veggie Pizza", price: "$17.99", onSale: false },
-    { img: menu7, title: "Pepperoni Pizza", price: "$20.99", onSale: true },
-    { img: menu8, title: "Four Cheese Pizza", price: "$22.99", onSale: false },
-  ];
+  // Fetch products from API
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('https://api-demo-4gqb.onrender.com/products');
+        if (!response.ok) {
+          throw new Error('Failed to fetch products');
+        }
+        const data = await response.json();
+        console.log(data);  // Check the structure in console
+        setProducts(data.data);  // Access the 'data' array
+        setLoading(false);
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  if (loading) {
+    return <div className="text-center mt-5"><Spinner animation="border" /></div>;
+  }
+
+  if (error) {
+    return <div className="text-center mt-5 text-danger">Error: {error}</div>;
+  }
 
   return (
     <div className="container p-5">
       <h1 className="text-left p-3">Our Menu</h1>
 
       <div className="row">
-        {pizzas.map((pizza, index) => (
+        {products.map((pizza, index) => (
           <div key={index} className="col-md-3 mb-3">
             <Card>
               <div style={{ position: 'relative' }}>
-                <Card.Img variant="top" src={pizza.img} />
-                {pizza.onSale && <span className="card-sale-tag">SALE</span>}
+                <Card.Img variant="top" src={pizza.image} alt={pizza.title} />
+                {pizza.salePrice && <span className="card-sale-tag">SALE</span>}
               </div>
               <Card.Body>
                 <Card.Title>{pizza.title}</Card.Title>
-                <Card.Text>Price: {pizza.price}</Card.Text>
+                <Card.Text>
+                  {/* Show salePrice if available, otherwise show regular price */}
+                  Price: {pizza.salePrice ? (
+                    <>
+                      <span className="text-muted text-decoration-line-through">${pizza.price}</span>
+                      &nbsp;
+                      <span className="text-danger">${pizza.salePrice}</span>
+                    </>
+                  ) : (
+                    <>${pizza.price}</>
+                  )}
+                </Card.Text>
                 <Button 
                   variant="dark" 
                   className="w-100 text-center"
-                  onClick={() => addToCart(pizza)}  // Thêm sản phẩm vào giỏ hàng khi nhấn nút "Buy"
+                  onClick={() => addToCart(pizza)}  // Add to cart
                 >
                   Buy
                 </Button>

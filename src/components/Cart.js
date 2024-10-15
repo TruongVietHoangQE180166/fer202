@@ -1,7 +1,5 @@
 import React from 'react';
 import { Modal, Button, Container, Row, Col } from 'react-bootstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 
 const Cart = ({ cartItems, setCartItems, showModal, handleClose }) => {
 

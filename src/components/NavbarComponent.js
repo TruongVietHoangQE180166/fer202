@@ -1,15 +1,27 @@
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Navbar, Nav, NavDropdown, Form, FormControl, Button, Container, Badge } from "react-bootstrap";
-import { FaShoppingCart } from 'react-icons/fa'; // Import icon giỏ hàng
-import Cart from './Cart'; // Import thành phần Cart
+import { FaShoppingCart } from "react-icons/fa";
+import Cart from "./Cart";
+import LoginComponent from "./LoginComponent";
 
 function NavbarComponent({ cartItems, setCartItems }) {
-  const [showModal, setShowModal] = useState(false); // Tạo state điều khiển modal
-  const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0); // Tính tổng số lượng giỏ hàng
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showCartModal, setShowCartModal] = useState(false);
 
-  const handleShow = () => setShowModal(true);  // Hàm để mở modal
-  const handleClose = () => setShowModal(false);  // Hàm để đóng modal
+  const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+
+  const onLoginSuccess = (user) => {
+    setIsLoggedIn(true);
+    console.log("User logged in:", user);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setIsLoggedIn(false);
+    setCartItems([]);
+  };
 
   return (
     <>
@@ -34,6 +46,7 @@ function NavbarComponent({ cartItems, setCartItems }) {
               <Nav.Link href="#">Contact</Nav.Link>
             </Nav>
 
+            {/* Form Tìm kiếm */}
             <Form className="d-flex">
               <FormControl
                 type="search"
@@ -44,37 +57,52 @@ function NavbarComponent({ cartItems, setCartItems }) {
               <Button variant="outline-light">Search</Button>
             </Form>
 
-            <Nav>
-              {/* Phần giỏ hàng với biểu tượng và số lượng */}
-              <Nav.Link onClick={handleShow} style={{ cursor: 'pointer' }}> {/* Thêm sự kiện onClick */}
-                <FaShoppingCart size={24} />
-                {totalItems > 0 && <Badge pill bg="danger">{totalItems}</Badge>}
-              </Nav.Link>
-              
-              <NavDropdown
-                title={
-                  <img
-                    src="https://cdn2.iconfinder.com/data/icons/people-occupation-job/64/Thief-Stealing-Criminal-Robber-Gangster-Robbery-Avatar-1024.png"
-                    className="rounded-circle"
-                    height="25"
-                    width="25"
-                    alt="User Avatar"
-                  />
-                }
-                id="userDropdown"
-                align="end"
-              >
-                <NavDropdown.Item href="#">Profile</NavDropdown.Item>
-                <NavDropdown.Item href="#">Order History</NavDropdown.Item>
-                <NavDropdown.Item href="#">Logout</NavDropdown.Item>
-              </NavDropdown>
+            {/* Sử dụng Nav thay cho div */}
+            <Nav className="align-items-center ms-0">
+              {isLoggedIn && (
+                <Nav.Link onClick={() => setShowCartModal(true)} style={{ cursor: "pointer" }} className="me-1">
+                  <FaShoppingCart size={24} />
+                  {totalItems > 0 && <Badge pill bg="danger">{totalItems}</Badge>}
+                </Nav.Link>
+              )}
+
+              {isLoggedIn ? (
+                <NavDropdown
+                  title={
+                    <img
+                      src="https://cdn2.iconfinder.com/data/icons/people-occupation-job/64/Thief-Stealing-Criminal-Robber-Gangster-Robbery-Avatar-1024.png"
+                      className="rounded-circle"
+                      height="25"
+                      width="25"
+                      alt="User Avatar"
+                    />
+                  }
+                  id="userDropdown"
+                  align="end"
+                >
+                  <NavDropdown.Item href="#">Profile</NavDropdown.Item>
+                  <NavDropdown.Item href="#">Order History</NavDropdown.Item>
+                  <NavDropdown.Item onClick={handleLogout}>Logout</NavDropdown.Item>
+                </NavDropdown>
+              ) : (
+                <Button variant="outline-light" onClick={() => setShowLoginModal(true)} className="ms-3">
+                  Login
+                </Button>
+              )}
             </Nav>
           </Navbar.Collapse>
         </Container>
       </Navbar>
 
-      {/* Gọi Cart và truyền state điều khiển modal */}
-      <Cart cartItems={cartItems} setCartItems={setCartItems} showModal={showModal} handleClose={handleClose} />
+      {/* Modal Giỏ Hàng */}
+      <Cart cartItems={cartItems} setCartItems={setCartItems} showModal={showCartModal} handleClose={() => setShowCartModal(false)} />
+
+      {/* Modal Đăng Nhập */}
+      <LoginComponent
+        modalOpen={showLoginModal}
+        toggleModal={() => setShowLoginModal(false)}
+        onLoginSuccess={onLoginSuccess}
+      />
     </>
   );
 }
